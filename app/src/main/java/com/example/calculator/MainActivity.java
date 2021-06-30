@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -41,10 +42,9 @@ public class MainActivity extends AppCompatActivity {
         Button subtractBTN = findViewById(R.id.subtractBTN);
         Button divideBTN = findViewById(R.id.divideBTN);
         Button multiplyBTN = findViewById(R.id.multiplyBTN);
-        Button plusMinusBTN = findViewById(R.id.plusMinusBTN);
         Button equalsBTN = findViewById(R.id.equalsBTN);
         Button bracketBTN = findViewById(R.id.bracketBTN);
-
+        Button remainderBTN = findViewById(R.id.remainderBTN);
 
         zero.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,6 +188,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        remainderBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                process = mathTextView.getText().toString();
+                mathTextView.setText(process + "%");
+            }
+        });
+
         bracketBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -208,22 +216,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 process = mathTextView.getText().toString();
-                process = process.replaceAll("×","*");
-                process = process.replaceAll("÷","/");
+                process = process.replaceAll("×", "*");
+                process = process.replaceAll("÷", "/");
+                process = process.replaceAll("%", "/100");
 
                 Context rhino = Context.enter();
                 rhino.setOptimizationLevel(-1);
                 String finalResult = "";
 
-                try{
-                    Scriptable scriptable = rhino.initStandardObjects();
-                    finalResult= rhino.evaluateString(scriptable,process,"javascript",1,null).toString();
-                }catch (Exception e){
-                    finalResult = "0";
+                if (mathTextView.getText().toString().length() == 0) {
+                    resultTextView.setText(null);
+
+                } else {
+                    try {
+                        Scriptable scriptable = rhino.initStandardObjects();
+                        finalResult = rhino.evaluateString(scriptable, process, "javascript", 1, null).toString();
+                    } catch (Exception e) {
+                        finalResult = "0";
+                    }
+                    resultTextView.setText(finalResult);
+
+
                 }
-                resultTextView.setText(finalResult);
-
-
             }
         });
 
